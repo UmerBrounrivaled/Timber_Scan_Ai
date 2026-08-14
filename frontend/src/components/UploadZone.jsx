@@ -1,5 +1,15 @@
 import React, { useState, useRef } from 'react';
-import { UploadCloud, Image as ImageIcon, Sparkles, FileCheck, X, AlertCircle } from 'lucide-react';
+import {
+  UploadCloud,
+  Image as ImageIcon,
+  Sparkles,
+  FileCheck,
+  X,
+  AlertCircle,
+  Info,
+  Layers,
+  CheckCircle2,
+} from 'lucide-react';
 
 export default function UploadZone({ onImageSelected, isAnalyzing }) {
   const [dragActive, setDragActive] = useState(false);
@@ -70,7 +80,35 @@ export default function UploadZone({ onImageSelected, isAnalyzing }) {
 
   return (
     <div className="space-y-4">
-      {/* Dropzone Container */}
+      {/* 1. Wood Domain & Model Training Guidance Card */}
+      <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-950/40 via-slate-900/80 to-slate-900/80 border border-amber-500/20 text-xs space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-amber-400 font-semibold">
+            <Info className="w-4 h-4 shrink-0" />
+            <span>Trained Domain: MVTec Natural Timber / Hardwood</span>
+          </div>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 font-mono border border-amber-500/20">
+            256×256 RGB
+          </span>
+        </div>
+
+        <p className="text-slate-300 text-[11px] leading-relaxed">
+          This model is trained specifically on <strong>natural timber & hardwood grain textures</strong>. For best accuracy:
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-400 pt-1">
+          <div className="flex items-start gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+            <span><strong>Best:</strong> Top-down, close-up photos of raw or varnished wood planks.</span>
+          </div>
+          <div className="flex items-start gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+            <span><strong>Note:</strong> Very light pale oak or painted wood may show higher baseline error.</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Dropzone Container */}
       <div
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -106,7 +144,7 @@ export default function UploadZone({ onImageSelected, isAnalyzing }) {
                 Drag & drop your wood inspection image here
               </h4>
               <p className="text-xs text-slate-400">
-                Supports standard high-resolution wood plank photos, cross-sections, and textures
+                Upload raw timber photos, cross-sections, or surface plank scans
               </p>
             </div>
 
