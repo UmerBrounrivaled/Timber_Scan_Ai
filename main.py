@@ -101,6 +101,8 @@ def get_sample_metadata(filename: str) -> dict:
 # Routes
 # ----------------------------------------------------------------------
 @app.get("/")
+@app.get("/health")
+@app.get("/api/health")
 def health_check():
     return {
         "status": "online",
