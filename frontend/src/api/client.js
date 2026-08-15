@@ -2,19 +2,27 @@
  * API client for TimberScan AI backend.
  */
 
+// Render backend URL fallback for Vercel / external frontend hosting
+const DEFAULT_RENDER_BACKEND = 'https://timber-scan-ai-2.onrender.com';
+
 // Determine API base URL dynamically
 const getApiBase = () => {
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL.replace(/\/$/, '');
   }
-  // In production browser environments (not localhost), default to relative URL path
+  // In production browser environments (not localhost):
   if (
     typeof window !== 'undefined' &&
     window.location &&
     !window.location.hostname.includes('localhost') &&
     !window.location.hostname.includes('127.0.0.1')
   ) {
-    return '';
+    // If running directly on Render (same origin as backend API), use relative path
+    if (window.location.hostname.includes('onrender.com')) {
+      return '';
+    }
+    // If running on Vercel or third-party static host, point to Render backend URL
+    return DEFAULT_RENDER_BACKEND;
   }
   return 'http://127.0.0.1:8000';
 };

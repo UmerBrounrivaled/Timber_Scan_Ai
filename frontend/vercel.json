@@ -1,0 +1,28 @@
+{
+  "rewrites": [
+    {
+      "source": "/health",
+      "destination": "https://timber-scan-ai-2.onrender.com/health"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://timber-scan-ai-2.onrender.com/api/:path*"
+    },
+    {
+      "source": "/samples",
+      "destination": "https://timber-scan-ai-2.onrender.com/samples"
+    },
+    {
+      "source": "/samples/files/:path*",
+      "destination": "https://timber-scan-ai-2.onrender.com/samples/files/:path*"
+    },
+    {
+      "source": "/predict-sample/:path*",
+      "destination": "https://timber-scan-ai-2.onrender.com/predict-sample/:path*"
+    },
+    {
+      "source": "/predict",
+      "destination": "https://timber-scan-ai-2.onrender.com/predict"
+    }
+  ]
+}
