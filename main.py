@@ -17,7 +17,7 @@ import json
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 
 from defect_pipeline import DefectPipeline
 
@@ -52,6 +52,11 @@ os.makedirs(SAMPLES_DIR, exist_ok=True)
 app.mount("/samples/files", StaticFiles(directory=SAMPLES_DIR), name="sample_files")
 
 VALID_EXTENSIONS = (".png", ".jpg", ".jpeg")
+
+# Serve built frontend static files if frontend/dist exists
+FRONTEND_DIST = os.path.join(os.path.dirname(__file__), "frontend", "dist")
+if os.path.exists(os.path.join(FRONTEND_DIST, "assets")):
+    app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIST, "assets")), name="frontend_assets")
 
 # ----------------------------------------------------------------------
 # Sample Categorization Helper
@@ -100,7 +105,6 @@ def get_sample_metadata(filename: str) -> dict:
 # ----------------------------------------------------------------------
 # Routes
 # ----------------------------------------------------------------------
-@app.get("/")
 @app.get("/health")
 @app.get("/api/health")
 def health_check():
@@ -111,6 +115,15 @@ def health_check():
         "threshold": THRESHOLD,
         "imgSize": 256,
     }
+
+
+@app.get("/")
+def read_root():
+    index_path = os.path.join(FRONTEND_DIST, "index.html")
+    if os.path.isfile(index_path):
+        return FileResponse(index_path)
+    return health_check()
+
 
 
 @app.get("/samples")

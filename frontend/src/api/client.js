@@ -2,19 +2,52 @@
  * API client for TimberScan AI backend.
  */
 
-// If running in development or standalone, use configured backend URL or proxy
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+// Determine API base URL dynamically
+const getApiBase = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/$/, '');
+  }
+  // In production browser environments (not localhost), default to relative URL path
+  if (
+    typeof window !== 'undefined' &&
+    window.location &&
+    !window.location.hostname.includes('localhost') &&
+    !window.location.hostname.includes('127.0.0.1')
+  ) {
+    return '';
+  }
+  return 'http://127.0.0.1:8000';
+};
+
+export const API_BASE = getApiBase();
+
+/**
+ * Returns full or relative URL for sample image files based on environment
+ */
+export function getSampleFileUrl(filename) {
+  if (!filename) return '';
+  const cleanFilename = encodeURIComponent(filename);
+  if (API_BASE) {
+    return `${API_BASE}/samples/files/${cleanFilename}`;
+  }
+  return `/samples/files/${cleanFilename}`;
+}
 
 async function request(path, options = {}) {
-  // Try direct backend first, fallback to relative proxied path
-  try {
-    const directRes = await fetch(`${API_BASE}${path}`, options);
-    if (directRes.ok) return directRes;
-  } catch {
-    // try relative proxy
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+
+  // 1. Try explicit API_BASE if set
+  if (API_BASE) {
+    try {
+      const directRes = await fetch(`${API_BASE}${cleanPath}`, options);
+      if (directRes.ok) return directRes;
+    } catch {
+      // Direct request failed (CORS or network error), fallback to relative
+    }
   }
 
-  const res = await fetch(path, options);
+  // 2. Try relative path (works when frontend is served from same domain or reverse-proxied)
+  const res = await fetch(cleanPath, options);
   return res;
 }
 
@@ -64,3 +97,4 @@ export async function predictUpload(file) {
   }
   return await res.json();
 }
+

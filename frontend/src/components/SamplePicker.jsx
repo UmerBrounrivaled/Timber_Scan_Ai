@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Sparkles, CheckCircle2, AlertTriangle, Layers, Filter } from 'lucide-react';
+import { getSampleFileUrl } from '../api/client';
 
 export default function SamplePicker({ samples, onSelectSample, activeSampleFilename, isAnalyzing }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -55,7 +56,7 @@ export default function SamplePicker({ samples, onSelectSample, activeSampleFile
                 {/* Thumbnail Image */}
                 <div className="relative aspect-square w-full bg-slate-950 overflow-hidden">
                   <img
-                    src={`http://127.0.0.1:8000/samples/files/${sample.filename}`}
+                    src={getSampleFileUrl(sample.filename)}
                     alt={sample.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"

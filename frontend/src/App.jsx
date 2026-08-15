@@ -42,25 +42,45 @@ export default function App() {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [isDocsOpen, setIsDocsOpen] = useState(false);
 
-  // Initialize server connection & fetch samples on load
+  // Initialize server connection & fetch samples with auto-retry for cold-starting services
   useEffect(() => {
-    async function init() {
+    let isMounted = true;
+    let timerId = null;
+
+    async function checkHealthAndSamples() {
       try {
         const health = await fetchHealth();
-        if (health) {
+        if (health && isMounted) {
           setIsOnline(true);
           if (health.threshold) setThreshold(health.threshold);
-        }
 
-        const sampleData = await fetchSamples();
-        if (sampleData && sampleData.samples) {
-          setSamples(sampleData.samples);
+          // Once connected, fetch benchmark samples if not loaded yet
+          const sampleData = await fetchSamples();
+          if (sampleData && sampleData.samples && isMounted) {
+            setSamples(sampleData.samples);
+          }
+          return true;
+        } else if (isMounted) {
+          setIsOnline(false);
         }
       } catch (err) {
-        console.warn('Initial server connection attempt:', err);
+        if (isMounted) setIsOnline(false);
       }
+      return false;
     }
-    init();
+
+    // Initial connection attempt
+    checkHealthAndSamples();
+
+    // Poll every 3 seconds if offline (retry waking server), or every 30 seconds if online
+    const interval = setInterval(async () => {
+      const connected = await checkHealthAndSamples();
+    }, 4000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   // Handle user file upload analysis
